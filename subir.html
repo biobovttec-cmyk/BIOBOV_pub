@@ -24,7 +24,7 @@
   <script>
     document.getElementById("subirBtn").addEventListener("click", async () => {
       try {
-        const response = await fetch("https://biobov.netlify.app/netlify/functions/biobov_function?accion=subir");
+        const response = await fetch("https://biobov.netlify.app/.netlify/functions/biobov_function?accion=subir");
         const data = await response.json();
         alert(data.message);
       } catch (err) {
