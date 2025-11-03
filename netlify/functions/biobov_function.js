@@ -14,8 +14,8 @@ exports.handler = async function(event, context) {
   const workflow = accion === "subir" ? "subir_expl.yml" : "borrar_expl.yml";
 
   try {
-    const githubToken = process.env.GITHUB_TOKEN; // Token con permisos para disparar workflows
-    const repo = "USUARIO/REPO"; // Cambia por tu repo privado
+    const githubToken = process.env.GITHUB_TOKEN;
+    const repo = "biobovttec-cmyk/BIOBOV_pub";
 
     const url = `https://api.github.com/repos/${repo}/actions/workflows/${workflow}/dispatches`;
     
@@ -27,7 +27,7 @@ exports.handler = async function(event, context) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        ref: "main" // rama donde disparar el workflow
+        ref: "main"
       })
     });
 
