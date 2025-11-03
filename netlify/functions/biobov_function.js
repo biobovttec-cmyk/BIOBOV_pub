@@ -14,7 +14,7 @@ exports.handler = async function(event, context) {
   const workflow = accion === "subir" ? "subir_expl.yml" : "borrar_expl.yml";
 
   try {
-    const githubToken = process.env.GITHUB_TOKEN;
+    const githubToken = process.env.PRIV_TOKEN;
     const repo = "biobovttec-cmyk/BIOBOV_pub";
 
     const url = `https://api.github.com/repos/${repo}/actions/workflows/${workflow}/dispatches`;
