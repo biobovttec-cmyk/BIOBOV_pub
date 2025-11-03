@@ -2,70 +2,35 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Borrar Explotación BIOBOV</title>
+  <title>Borrar Explotación</title>
   <style>
-    body {
-      background-color: #f7f7f7;
-      text-align: center;
-      font-family: Arial, sans-serif;
-      margin-top: 150px;
-    }
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
     button {
       background-color: #be3d05;
-      color: #ffffff;
-      border: none;
-      border-radius: 10px;
-      padding: 20px 50px;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-    button:hover {
-      background-color: #a83604;
-    }
-    #mensaje {
-      margin-top: 40px;
+      color: white;
+      font-family: Arial, sans-serif;
       font-size: 18px;
-      font-weight: bold;
-      color: #333;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
+    button:hover { opacity: 0.9; }
   </style>
 </head>
 <body>
-
-  <button id="btnBorrar">🗑️ Borrar Explotación</button>
-  <p id="mensaje"></p>
+  <button id="borrarBtn">Borrar Explotación</button>
 
   <script>
-    const usuario = "Informesttec";
-    const repo = "BIOBOV";
-    const token = "TOKEN";
-    const branch = "main";
-
-    async function ejecutarWorkflow() {
-      const url = `https://api.github.com/repos/${usuario}/${repo}/actions/workflows/borrar_expl.yml/dispatches`;
-      const respuesta = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Accept": "application/vnd.github+json",
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ ref: branch })
-      });
-
-      const mensaje = document.getElementById("mensaje");
-      if (respuesta.ok) {
-        mensaje.textContent = "✅ Workflow de borrado ejecutado correctamente.";
-      } else {
-        const err = await respuesta.json();
-        mensaje.textContent = `❌ Error: ${err.message || respuesta.statusText}`;
+    document.getElementById("borrarBtn").addEventListener("click", async () => {
+      try {
+        const response = await fetch("https://TU_DOMINIO_NETLIFY.netlify.app/.netlify/functions/biobov_function?accion=borrar");
+        const data = await response.json();
+        alert(data.message);
+      } catch (err) {
+        alert("Error al ejecutar la acción: " + err);
       }
-    }
-
-    document.getElementById("btnBorrar").onclick = ejecutarWorkflow;
+    });
   </script>
-
 </body>
 </html>
