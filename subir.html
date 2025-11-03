@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Subir Explotación BIOBOV</title>
+  <style>
+    body {
+      background-color: #f7f7f7;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      margin-top: 150px;
+    }
+    button {
+      background-color: #be3d05;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 20px 50px;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    button:hover {
+      background-color: #a83604;
+    }
+    #mensaje {
+      margin-top: 40px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="btnSubir">⬆️ Subir Explotación</button>
+  <p id="mensaje"></p>
+
+  <script>
+    const usuario = "Informesttec";
+    const repo = "BIOBOV";
+    const token = "TOKEN";
+    const branch = "main";
+
+    async function ejecutarWorkflow() {
+      const url = `https://api.github.com/repos/${usuario}/${repo}/actions/workflows/explotaciones.yml/dispatches`;
+      const respuesta = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Accept": "application/vnd.github+json",
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ ref: branch })
+      });
+
+      const mensaje = document.getElementById("mensaje");
+      if (respuesta.ok) {
+        mensaje.textContent = "✅ Workflow de subida ejecutado correctamente.";
+      } else {
+        const err = await respuesta.json();
+        mensaje.textContent = `❌ Error: ${err.message || respuesta.statusText}`;
+      }
+    }
+
+    document.getElementById("btnSubir").onclick = ejecutarWorkflow;
+  </script>
+
+</body>
+</html>
