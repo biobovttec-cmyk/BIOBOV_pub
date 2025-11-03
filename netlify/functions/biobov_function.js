@@ -17,7 +17,7 @@ exports.handler = async function(event, context) {
 
     const workflow = accion === "subir" ? "subir_expl.yml" : "borrar_expl.yml";
 
-    const githubToken = process.env.GITHUB_TOKEN;
+    const githubToken = process.env.PRIV_TOKEN;
     if (!githubToken) {
       return { 
         statusCode: 500, 
