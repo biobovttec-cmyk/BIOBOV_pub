@@ -1,60 +1,53 @@
 const fetch = require("node-fetch");
 
-exports.handler = async (event, context) => {
-  // Obtener parámetro de acción: subir o borrar
+exports.handler = async function(event, context) {
   const accion = event.queryStringParameters?.accion;
 
   if (!accion || !["subir", "borrar"].includes(accion)) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ message: "Parámetro 'accion' inválido" }),
+      body: JSON.stringify({ error: "Parámetro 'accion' inválido. Use 'subir' o 'borrar'." })
     };
   }
 
-  // Variables para tu repo privado y workflow
-  const owner = "TU_USUARIO";
-  const repo = "TU_REPO";
-  const workflow_subir = "subir_explotacion.yml";
-  const workflow_borrar = "borrar_explotacion.yml";
-  const github_token = process.env.GITHUB_TOKEN; // token guardado en Netlify env vars
-
-  // Elegir workflow según la acción
-  const workflow_file = accion === "subir" ? workflow_subir : workflow_borrar;
-
-  // Llamada al API de GitHub para disparar workflow
-  const url = `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${workflow_file}/dispatches`;
-
-  const body = {
-    ref: "main", // rama que ejecuta el workflow
-  };
+  // Mapeo a tus workflows de GitHub Actions
+  const workflow = accion === "subir" ? "subir_expl.yml" : "borrar_expl.yml";
 
   try {
+    const githubToken = process.env.GITHUB_TOKEN; // Token con permisos para disparar workflows
+    const repo = "USUARIO/REPO"; // Cambia por tu repo privado
+
+    const url = `https://api.github.com/repos/${repo}/actions/workflows/${workflow}/dispatches`;
+    
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Accept": "application/vnd.github+json",
-        "Authorization": `Bearer ${github_token}`,
-        "Content-Type": "application/json",
+        "Authorization": `Bearer ${githubToken}`,
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        ref: "main" // rama donde disparar el workflow
+      })
     });
 
-    if (response.status === 204) {
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ message: `Workflow '${accion}' disparado correctamente.` }),
-      };
-    } else {
-      const data = await response.json();
+    if (!response.ok) {
+      const text = await response.text();
       return {
         statusCode: response.status,
-        body: JSON.stringify({ message: "Error al disparar workflow", data }),
+        body: `Error disparando workflow: ${text}`
       };
     }
-  } catch (error) {
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: `Workflow '${workflow}' ejecutado correctamente.` })
+    };
+
+  } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Error interno", error }),
+      body: JSON.stringify({ error: err.message })
     };
   }
 };
