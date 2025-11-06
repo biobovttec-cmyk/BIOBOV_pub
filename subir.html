@@ -4,11 +4,17 @@
   <meta charset="UTF-8">
   <title>Subir Explotación</title>
   <style>
-    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    body { 
+      font-family: Arial, sans-serif; 
+      display: flex; 
+      flex-direction: column;
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+    }
     button {
       background-color: #be3d05;
       color: white;
-      font-family: Arial, sans-serif;
       font-size: 18px;
       padding: 15px 30px;
       border: none;
@@ -16,19 +22,39 @@
       cursor: pointer;
     }
     button:hover { opacity: 0.9; }
+    #mensaje {
+      margin-top: 15px;
+      color: green;
+      font-size: 16px;
+      display: none;
+    }
+    #mensaje.error {
+      color: red;
+    }
   </style>
 </head>
 <body>
   <button id="subirBtn">Subir Explotación</button>
+  <div id="mensaje"></div>
 
   <script>
-    document.getElementById("subirBtn").addEventListener("click", async () => {
+    const boton = document.getElementById("subirBtn");
+    const mensaje = document.getElementById("mensaje");
+
+    boton.addEventListener("click", async () => {
+      mensaje.style.display = "none";
       try {
         const response = await fetch("https://biobov.netlify.app/.netlify/functions/biobov_function?accion=subir");
         const data = await response.json();
-        alert(data.message);
+        mensaje.textContent = data.message || "Operación completada correctamente.";
+        mensaje.className = "";
+        mensaje.style.display = "block";
+        setTimeout(() => mensaje.style.display = "none", 4000);
       } catch (err) {
-        alert("Error al ejecutar la acción: " + err);
+        mensaje.textContent = "Error al ejecutar la acción: " + err;
+        mensaje.className = "error";
+        mensaje.style.display = "block";
+        setTimeout(() => mensaje.style.display = "none", 5000);
       }
     });
   </script>
