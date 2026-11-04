@@ -1,34 +1,43 @@
+
 exports.handler = async function(event, context) {
   try {
     if (event.httpMethod !== "GET") {
-      return { 
-        statusCode: 405, 
-        body: JSON.stringify({ error: "Método no permitido" }) 
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ error: "Método no permitido" })
       };
     }
 
     const accion = event.queryStringParameters?.accion;
-    if (!accion || !["subir", "borrar"].includes(accion)) {
-      return { 
-        statusCode: 400, 
-        body: JSON.stringify({ error: "Parámetro 'accion' inválido. Use 'subir' o 'borrar'." }) 
+    const workflows = {
+      subir: "subir_expl.yml",
+      borrar: "borrar_expl.yml",
+      exportar_memorias: "Exportar_memorias.yml"
+    };
+
+    if (!accion || !workflows[accion]) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: "Parámetro 'accion' inválido. Use 'subir', 'borrar' o 'exportar_memorias'."
+        })
       };
     }
 
-    const workflow = accion === "subir" ? "subir_expl.yml" : "borrar_expl.yml";
-
+    const workflow = workflows[accion];
     const githubToken = process.env.PRIV_TOKEN;
+
     if (!githubToken) {
-      return { 
-        statusCode: 500, 
-        body: JSON.stringify({ error: "No se encontró token de GitHub en Netlify" }) 
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          error: "No se encontró token de GitHub en Netlify"
+        })
       };
     }
 
     const repo = "biobovttec-cmyk/BIOBOV_priv";
     const url = `https://api.github.com/repos/${repo}/actions/workflows/${workflow}/dispatches`;
-
-    const bodyPayload = { ref: "main" };
 
     const res = await fetch(url, {
       method: "POST",
@@ -37,27 +46,40 @@ exports.handler = async function(event, context) {
         "Authorization": `Bearer ${githubToken}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(bodyPayload)
+      body: JSON.stringify({ ref: "main" })
     });
 
     if (!res.ok) {
-      const text = await res.text();
+      const errorText = await res.text();
       return {
         statusCode: res.status,
-        body: JSON.stringify({ error: "Error disparando workflow: " + text })
+        body: JSON.stringify({
+          error: "Error al solicitar la ejecución del workflow: " + errorText
+        })
       };
     }
 
+    const mensajes = {
+      subir: "La subida se ha solicitado correctamente.",
+      borrar: "El borrado se ha solicitado correctamente.",
+      exportar_memorias: "La exportación de memorias se ha solicitado correctamente. El Excel se generará en segundo plano."
+    };
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: `Workflow '${workflow}' ejecutado correctamente.` })
+      body: JSON.stringify({
+        message: mensajes[accion],
+        workflow: workflow
+      })
     };
 
   } catch (err) {
     console.error("Error detallado:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Error al activar workflow: " + (err.message || JSON.stringify(err)) })
+      body: JSON.stringify({
+        error: "Error al activar workflow: " + (err.message || JSON.stringify(err))
+      })
     };
   }
 };
