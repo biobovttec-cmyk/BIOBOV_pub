@@ -1,1 +1,95 @@
 
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exportar memorias</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    button {
+      background-color: #2878a5;
+      color: white;
+      font-size: 18px;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    #mensaje {
+      margin-top: 15px;
+      color: green;
+      font-size: 15px;
+      text-align: center;
+      max-width: 90%;
+      display: none;
+    }
+
+    #mensaje.error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="exportarBtn">Exportar memorias</button>
+  <div id="mensaje"></div>
+
+  <script>
+    const boton = document.getElementById("exportarBtn");
+    const mensaje = document.getElementById("mensaje");
+
+    boton.addEventListener("click", async () => {
+      boton.disabled = true;
+      boton.textContent = "Solicitando exportación...";
+      mensaje.style.display = "none";
+
+      try {
+        const response = await fetch(
+          "https://biobov.netlify.app/.netlify/functions/biobov_function?accion=exportar_memorias"
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "No se pudo iniciar la exportación.");
+        }
+
+        mensaje.textContent = data.message;
+        mensaje.className = "";
+        mensaje.style.display = "block";
+
+      } catch (err) {
+        mensaje.textContent = "Error al solicitar la exportación: " + err.message;
+        mensaje.className = "error";
+        mensaje.style.display = "block";
+
+      } finally {
+        boton.disabled = false;
+        boton.textContent = "Exportar memorias";
+      }
+    });
+  </script>
+
+</body>
+</html>
