@@ -51,15 +51,11 @@
     const mensaje = document.getElementById("mensaje");
 
     boton.addEventListener("click", async () => {
-      const confirmar = confirm(
-        "¿Estás segura de que quieres iniciar el borrado de las afecciones marcadas?"
-      );
-
-      if (!confirmar) return;
-
       boton.disabled = true;
       boton.textContent = "Solicitando borrado...";
-      mensaje.style.display = "none";
+      mensaje.textContent = "Contactando con Netlify...";
+      mensaje.className = "";
+      mensaje.style.display = "block";
 
       try {
         const response = await fetch(
@@ -74,13 +70,9 @@
 
         mensaje.textContent = data.message || "Solicitud enviada correctamente a GitHub Actions.";
         mensaje.className = "";
-        mensaje.style.display = "block";
-
       } catch (err) {
         mensaje.textContent = "Error al solicitar el borrado: " + err.message;
         mensaje.className = "error";
-        mensaje.style.display = "block";
-
       } finally {
         boton.disabled = false;
         boton.textContent = "Confirmar borrado";
@@ -90,3 +82,4 @@
 
 </body>
 </html>
+
