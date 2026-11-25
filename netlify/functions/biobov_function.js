@@ -12,14 +12,15 @@ exports.handler = async function(event, context) {
     const workflows = {
       subir: "subir_expl.yml",
       borrar: "borrar_expl.yml",
-      exportar_memorias: "Exportar_memorias.yml"
+      exportar_memorias: "Exportar_memorias.yml",
+      borrar_afecciones: "borrar_afecciones.yml"
     };
 
     if (!accion || !workflows[accion]) {
       return {
         statusCode: 400,
         body: JSON.stringify({
-          error: "Parámetro 'accion' inválido. Use 'subir', 'borrar' o 'exportar_memorias'."
+          error: "Parámetro 'accion' inválido."
         })
       };
     }
@@ -62,7 +63,8 @@ exports.handler = async function(event, context) {
     const mensajes = {
       subir: "La subida se ha solicitado correctamente.",
       borrar: "El borrado se ha solicitado correctamente.",
-      exportar_memorias: "La exportación de memorias se ha solicitado correctamente. El Excel se generará en segundo plano."
+      exportar_memorias: "La exportación de memorias se ha solicitado correctamente. El Excel se generará en segundo plano.",
+      borrar_afecciones: "El proceso de eliminación de afecciones se ha solicitado correctamente."
     };
 
     return {
@@ -83,3 +85,4 @@ exports.handler = async function(event, context) {
     };
   }
 };
+
