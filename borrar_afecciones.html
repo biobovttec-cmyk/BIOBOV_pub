@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmar borrado</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    button {
+      background-color: #C0392B;
+      color: white;
+      font-size: 15px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { opacity: 0.9; }
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+    #mensaje {
+      margin-top: 12px;
+      color: #287A45;
+      font-size: 13px;
+      text-align: center;
+      max-width: 90%;
+      display: none;
+    }
+    #mensaje.error { color: #C0392B; }
+  </style>
+</head>
+<body>
+
+  <button id="borrarBtn">Confirmar borrado</button>
+  <div id="mensaje"></div>
+
+  <script>
+    const boton = document.getElementById("borrarBtn");
+    const mensaje = document.getElementById("mensaje");
+
+    boton.addEventListener("click", async () => {
+      const confirmar = confirm(
+        "¿Estás segura de que quieres iniciar el borrado de las afecciones marcadas?"
+      );
+
+      if (!confirmar) return;
+
+      boton.disabled = true;
+      boton.textContent = "Solicitando borrado...";
+      mensaje.style.display = "none";
+
+      try {
+        const response = await fetch(
+          "https://biobov.netlify.app/.netlify/functions/biobov_function?accion=borrar_afecciones"
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "No se pudo iniciar el borrado.");
+        }
+
+        mensaje.textContent = data.message || "Solicitud enviada correctamente a GitHub Actions.";
+        mensaje.className = "";
+        mensaje.style.display = "block";
+
+      } catch (err) {
+        mensaje.textContent = "Error al solicitar el borrado: " + err.message;
+        mensaje.className = "error";
+        mensaje.style.display = "block";
+
+      } finally {
+        boton.disabled = false;
+        boton.textContent = "Confirmar borrado";
+      }
+    });
+  </script>
+
+</body>
+</html>
